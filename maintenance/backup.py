@@ -83,6 +83,24 @@ def rotate_backups():
     else:
         print(f"{deleted} archive(s) supprimée(s).")
 
+def rotate_backups_remote():
+    """Supprimer les archives de plus de 7 jours sur VM2."""
+    print(f"\n[4/4] Rotation des sauvegardes distantes (> 7 jours)")
+    
+    cmd = [
+        "ssh",
+        "-i", SSH_KEY_PATH,
+        "-o", "StrictHostKeyChecking=no",
+        f"{BACKUP_USER}@{BACKUP_HOST}",
+        f"find {BACKUP_PATH} -name 'backup_*.tar.gz' -mtime +7 -delete && echo 'Rotation distante effectuée'"
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        print(f"Erreur rotation distante : {result.stderr}")
+    else:
+        print(result.stdout.strip() or "Aucune archive distante à supprimer.")
+
 
 if __name__ == "__main__":
     while True:
@@ -90,6 +108,7 @@ if __name__ == "__main__":
         create_archive()
         transfer_archive()
         rotate_backups()
+        rotate_backups_remote
         print("\n=== Sauvegarde terminée avec succès ===")
         print("\nProchaine sauvegarde dans 1 heure...")
         time.sleep(3600)
