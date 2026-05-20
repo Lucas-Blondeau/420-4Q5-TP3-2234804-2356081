@@ -2,6 +2,7 @@ import os
 import subprocess
 import datetime
 import glob
+from datetime import time
 
 # --- Configuration depuis les variables d'environnement ---
 BACKUP_USER = os.environ.get("BACKUP_USER")
@@ -84,8 +85,11 @@ def rotate_backups():
 
 
 if __name__ == "__main__":
-    print("=== Début de la sauvegarde ===")
-    create_archive()
-    transfer_archive()
-    rotate_backups()
-    print("\n=== Sauvegarde terminée avec succès ===")
+    while True:
+        print("=== Début de la sauvegarde ===")
+        create_archive()
+        transfer_archive()
+        rotate_backups()
+        print("\n=== Sauvegarde terminée avec succès ===")
+        print("\nProchaine sauvegarde dans 1 heure...")
+        time.sleep(3600)
